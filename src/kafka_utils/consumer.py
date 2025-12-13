@@ -77,6 +77,7 @@ class KafkaConsumer:
                     if msg.error().code() == KafkaError._PARTITION_EOF:
                         logger.debug(f"Reached end of partition {msg.partition()}")
                     else:
+                        logger.error(f"Kafka error: {msg.error()}")
                         raise KafkaException(msg.error())
                     continue
 
@@ -86,21 +87,12 @@ class KafkaConsumer:
                 if value:
                     try:
                         json_message = json.loads(value.decode("utf-8"))
-                        
-                        # Enhanced logging with clear event flow
-                        logger.info("=" * 80)
-                        logger.info(f"📥 EVENT CONSUMED ← Topic: '{msg.topic()}'")
-                        logger.info(f"   Partition: {msg.partition()}, Offset: {msg.offset()}")
-                        if msg.key():
-                            logger.info(f"   Key: {msg.key().decode('utf-8')}")
-                        logger.info(f"   Event: {json.dumps(json_message, indent=2)}")
-                        logger.info("=" * 80)
-                        
+                        logger.info(f"📥 [CONSUMER] Received message from topic '{msg.topic()}'")
                         message_handler(json_message)
                     except json.JSONDecodeError as e:
                         logger.error(f"Failed to parse JSON message: {e}")
                     except Exception as e:
-                        logger.error(f"Error processing message: {e}")
+                        logger.error(f"Error processing message: {e}", exc_info=True)
 
             except KafkaException as e:
                 consecutive_errors += 1
@@ -114,7 +106,7 @@ class KafkaConsumer:
                     consecutive_errors = 0
 
             except Exception as e:
-                logger.error(f"Unexpected error in consumer loop: {e}")
+                logger.error(f"Unexpected error in consumer loop: {e}", exc_info=True)
                 time.sleep(1)
 
     def _reconnect(self):

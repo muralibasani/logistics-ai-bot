@@ -45,14 +45,7 @@ class KafkaProducer:
             )
             self._producer.poll(0)
             
-            # Enhanced logging with clear event flow
-            logger.info("=" * 80)
-            logger.info(f"📤 EVENT PRODUCED → Topic: '{topic}'")
-            if key:
-                logger.info(f"   Key: {key}")
-            logger.info(f"   Event: {json.dumps(message, indent=2)}")
-            logger.info("=" * 80)
-            
+            logger.debug(f"Message produced to topic '{topic}'")
             return True
         except Exception as e:
             logger.error(f"Failed to produce message to '{topic}': {e}")

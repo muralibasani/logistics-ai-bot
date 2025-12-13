@@ -39,8 +39,6 @@ def get_consumer_config(group_id: str) -> Dict[str, Any]:
 
 
 TOPICS = {
-    "raw_input": "events.input.raw",
-    "classified": "events.input.classified",
     "commands": "events.workflow.commands",
     "output": "events.output.message",
 }
