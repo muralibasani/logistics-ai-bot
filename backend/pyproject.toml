@@ -24,6 +24,7 @@ dependencies = [
     "mongoengine>=0.29.1",
     "postgres>=4.0",
     "psycopg2-binary>=2.9.0",
-    "confluent-kafka>=2.12.2",
+    "confluent-kafka[avro]>=2.12.2",
+    "fastavro>=1.8.0",
     "uvicorn[standard]>=0.30.0",
 ]

@@ -1,9 +1,12 @@
 import os
+import logging
 from pathlib import Path
 from typing import Any, Dict
 from dotenv import load_dotenv
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 
 def get_kafka_config() -> Dict[str, Any]:
@@ -28,15 +31,26 @@ def get_kafka_config() -> Dict[str, Any]:
         ssl_password = os.getenv("KAFKA_SSL_PASSWORD", "log321")
         
         if ca_cert.exists():
-            config["ssl.ca.location"] = str(ca_cert)
+            config["ssl.ca.location"] = str(ca_cert.absolute())
+        else:
+            logger.warning(f"CA certificate not found at: {ca_cert.absolute()}")
         if client_cert.exists():
-            config["ssl.certificate.location"] = str(client_cert)
+            config["ssl.certificate.location"] = str(client_cert.absolute())
+        else:
+            logger.warning(f"Client certificate not found at: {client_cert.absolute()}")
         if client_key.exists():
-            config["ssl.key.location"] = str(client_key)
+            config["ssl.key.location"] = str(client_key.absolute())
             config["ssl.key.password"] = ssl_password
+        else:
+            logger.warning(f"Client key not found at: {client_key.absolute()}")
         
         # Optional: Set SSL protocol version
         config["ssl.endpoint.identification.algorithm"] = "none"  # or "https" for hostname verification
+        
+        # Additional network settings for better connection handling
+        config["socket.timeout.ms"] = 60000  # 60 seconds
+        config["metadata.request.timeout.ms"] = 60000
+        config["api.version.request.timeout.ms"] = 60000
     
     return config
 
@@ -69,4 +83,38 @@ def get_consumer_config(group_id: str) -> Dict[str, Any]:
 TOPICS = {
     "commands": "events.workflow.commands",
     "output": "events.output.message",
+    "insights": "events.insights.message",
 }
+
+
+def get_schema_registry_url() -> str:
+    """Get Schema Registry URL from environment variables."""
+    return os.getenv("KAFKA_SCHEMA_REGISTRY_URL", "http://localhost:8081")
+
+
+def get_schema_registry_config() -> Dict[str, Any]:
+    """Get Schema Registry configuration."""
+    schema_registry_url = get_schema_registry_url()
+    
+    # Extract credentials from URL if present (format: https://user:pass@host:port)
+    config = {}
+    
+    # If URL contains credentials, extract them
+    if "@" in schema_registry_url:
+        # Format: https://user:pass@host:port
+        parts = schema_registry_url.split("@")
+        if len(parts) == 2:
+            auth_part = parts[0].split("//")[-1]
+            if ":" in auth_part:
+                username, password = auth_part.split(":", 1)
+                config["basic.auth.user.info"] = f"{username}:{password}"
+            # Extract the base URL without credentials
+            protocol = schema_registry_url.split("//")[0]
+            host_part = parts[1]
+            config["url"] = f"{protocol}//{host_part}"
+        else:
+            config["url"] = schema_registry_url
+    else:
+        config["url"] = schema_registry_url
+    
+    return config
