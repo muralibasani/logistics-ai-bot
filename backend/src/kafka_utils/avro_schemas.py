@@ -25,3 +25,18 @@ OUTPUT_EVENT_SCHEMA = {
     ]
 }
 
+INSIGHT_EVENT_SCHEMA = {
+    "type": "record",
+    "name": "InsightEvent",
+    "namespace": "com.logistics.events",
+    "fields": [
+        {"name": "insight_id", "type": "string"},
+        {"name": "insight_type", "type": "string"},
+        {"name": "title", "type": "string"},
+        {"name": "description", "type": "string"},
+        {"name": "data", "type": {"type": "map", "values": "string"}},
+        {"name": "priority", "type": {"type": "enum", "name": "Priority", "symbols": ["low", "medium", "high"]}},
+        {"name": "timestamp", "type": "string"}
+    ]
+}
+

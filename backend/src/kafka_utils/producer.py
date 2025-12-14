@@ -11,7 +11,7 @@ from src.kafka_utils.avro_serializer import (
     register_schema,
     serialize_avro
 )
-from src.kafka_utils.avro_schemas import COMMAND_EVENT_SCHEMA, OUTPUT_EVENT_SCHEMA
+from src.kafka_utils.avro_schemas import COMMAND_EVENT_SCHEMA, OUTPUT_EVENT_SCHEMA, INSIGHT_EVENT_SCHEMA
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +24,7 @@ class KafkaProducer:
         self._connected = False
         self._command_serializer = None
         self._output_serializer = None
+        self._insight_serializer = None
         self._schemas_registered = False
 
     def connect(self) -> bool:
@@ -60,9 +61,10 @@ class KafkaProducer:
                     # This is optional - auto-register in serializer will handle it if this fails
                     cmd_schema_id = register_schema(TOPICS["commands"], COMMAND_EVENT_SCHEMA)
                     output_schema_id = register_schema(TOPICS["output"], OUTPUT_EVENT_SCHEMA)
+                    insight_schema_id = register_schema(TOPICS["insights"], INSIGHT_EVENT_SCHEMA)
                     
-                    if cmd_schema_id and output_schema_id:
-                        logger.info(f"Schemas pre-registered: commands={cmd_schema_id}, output={output_schema_id}")
+                    if cmd_schema_id and output_schema_id and insight_schema_id:
+                        logger.info(f"Schemas pre-registered: commands={cmd_schema_id}, output={output_schema_id}, insights={insight_schema_id}")
                     else:
                         logger.info("Schemas will be auto-registered by serializer on first use")
                     
@@ -70,6 +72,7 @@ class KafkaProducer:
                     # This ensures schemas are registered even if pre-registration failed
                     self._command_serializer = get_avro_serializer(COMMAND_EVENT_SCHEMA, auto_register=True)
                     self._output_serializer = get_avro_serializer(OUTPUT_EVENT_SCHEMA, auto_register=True)
+                    self._insight_serializer = get_avro_serializer(INSIGHT_EVENT_SCHEMA, auto_register=True)
                     
                     self._schemas_registered = True
                     logger.info("Avro serializers created with auto-registration enabled")
@@ -85,6 +88,9 @@ class KafkaProducer:
             elif topic == TOPICS["output"]:
                 schema = OUTPUT_EVENT_SCHEMA
                 serializer = self._output_serializer
+            elif topic == TOPICS["insights"]:
+                schema = INSIGHT_EVENT_SCHEMA
+                serializer = self._insight_serializer
             else:
                 logger.error(f"Unknown topic '{topic}'. Cannot determine schema.")
                 return False
