@@ -1,4 +1,4 @@
-# Logistics AI Chatbot guide
+# Logistics AI Insights / Chatbot guide
 
 This guide explains how to run the Logistics AI Bot with the React frontend.
 
@@ -21,6 +21,8 @@ Gateway (consumes response)
     ↓
 FastAPI returns response to Frontend
 ```
+
+<img src="architecture.png" alt="Architecture" width="600">
 
 ## Prerequisites
 
