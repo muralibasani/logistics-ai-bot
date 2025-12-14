@@ -28,7 +28,7 @@ FastAPI returns response to Frontend
 
 1. **Kafka** must be running
 2. **Python 3.12+** with dependencies installed
-3. **Node.js** for the React frontend
+3. **Node.js** / npm for the React frontend
 
 ## Setup
 
@@ -169,6 +169,5 @@ If you see CORS errors, make sure:
 
 - The Gateway and Responder services start automatically when the API server starts
 - Both consumers run in background threads
-- Messages are processed asynchronously through Kafka
 - Default tool messages (greetings, etc.) are handled directly without Kafka
 
