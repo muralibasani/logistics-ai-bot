@@ -1,0 +1,28 @@
+[project]
+name = "Workshop4"
+version = "0.1.0"
+description = "Workshop4"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.120.1",
+    "langchain>=1.0.2",
+    "langchain-community>=0.4.1",
+    "langchain-huggingface>=1.0.0",
+    "langchain-ollama>=1.0.0",
+    "langchain-text-splitters>=1.0.0",
+    "sentence-transformers>=5.1.2",
+    "faiss-cpu>=1.12.0",
+    "huggingface-hub>=0.35.0",
+    "grandalf>=0.8",
+    "langchain-chroma>=1.0.0",
+    "dotenv>=0.9.9",
+    "beautifulsoup4>=4.14.2",
+    "playwright>=1.55.0",
+    "langchain-openai>=1.0.1",
+    "pymongo>=4.15.3",
+    "mongoengine>=0.29.1",
+    "postgres>=4.0",
+    "psycopg2-binary>=2.9.0",
+    "confluent-kafka>=2.12.2",
+]
