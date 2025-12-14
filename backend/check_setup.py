@@ -20,6 +20,10 @@ def check_kafka_connection():
         print(f"✅ Kafka Config:")
         print(f"   Bootstrap Servers: {config.get('bootstrap.servers')}")
         print(f"   Security Protocol: {config.get('security.protocol')}")
+        if config.get('security.protocol') in ['SSL', 'SASL_SSL']:
+            print(f"   SSL CA Location: {config.get('ssl.ca.location', 'Not set')}")
+            print(f"   SSL Certificate: {config.get('ssl.certificate.location', 'Not set')}")
+            print(f"   SSL Key Location: {config.get('ssl.key.location', 'Not set')}")
         print()
         
         # Try to create a consumer to test connection

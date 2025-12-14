@@ -4,8 +4,14 @@ import time
 from typing import Any, Callable, Dict, List, Optional
 
 from confluent_kafka import Consumer, KafkaError, KafkaException
+from confluent_kafka.serialization import SerializationContext, MessageField
 
-from src.kafka_utils.config import get_consumer_config
+from src.kafka_utils.config import get_consumer_config, TOPICS
+from src.kafka_utils.avro_serializer import (
+    get_avro_deserializer,
+    deserialize_avro
+)
+from src.kafka_utils.avro_schemas import COMMAND_EVENT_SCHEMA, OUTPUT_EVENT_SCHEMA
 
 logger = logging.getLogger(__name__)
 
@@ -22,9 +28,12 @@ class KafkaConsumer:
         self._max_retries = 5
         self._base_backoff = 1.0
         self._max_backoff = 60.0
+        self._command_deserializer = None
+        self._output_deserializer = None
+        self._deserializers_initialized = False
 
     def connect(self) -> bool:
-        """Connect to Kafka broker with retry logic."""
+        """Connect to Kafka broker with retry logic and initialize Avro deserializers."""
         retries = 0
         while retries < self._max_retries:
             try:
@@ -33,6 +42,18 @@ class KafkaConsumer:
                 self._consumer.subscribe(self.topics)
                 self._connected = True
                 logger.info(f"Kafka consumer connected. Subscribed to: {self.topics}")
+                
+                # Initialize Avro deserializers
+                if not self._deserializers_initialized:
+                    try:
+                        self._command_deserializer = get_avro_deserializer(COMMAND_EVENT_SCHEMA)
+                        self._output_deserializer = get_avro_deserializer(OUTPUT_EVENT_SCHEMA)
+                        self._deserializers_initialized = True
+                        logger.info("Avro deserializers initialized")
+                    except Exception as e:
+                        logger.warning(f"Failed to initialize Avro deserializers: {e}. Using fallback deserialization.")
+                        # Continue without Schema Registry - will use direct Avro deserialization
+                
                 return True
             except Exception as e:
                 retries += 1
@@ -86,13 +107,30 @@ class KafkaConsumer:
                 
                 if value:
                     try:
-                        json_message = json.loads(value.decode("utf-8"))
-                        logger.info(f"📥 [CONSUMER] Received message from topic '{msg.topic()}'")
-                        message_handler(json_message)
-                    except json.JSONDecodeError as e:
-                        logger.error(f"Failed to parse JSON message: {e}")
+                        # Deserialize Avro message
+                        topic = msg.topic()
+                        if topic == TOPICS["commands"]:
+                            schema = COMMAND_EVENT_SCHEMA
+                            deserializer = self._command_deserializer
+                        elif topic == TOPICS["output"]:
+                            schema = OUTPUT_EVENT_SCHEMA
+                            deserializer = self._output_deserializer
+                        else:
+                            logger.error(f"Unknown topic '{topic}'. Cannot determine schema.")
+                            continue
+                        
+                        if deserializer:
+                            # Use Schema Registry deserializer
+                            context = SerializationContext(topic, MessageField.VALUE)
+                            avro_message = deserializer(value, context)
+                        else:
+                            # Fallback: direct Avro deserialization
+                            avro_message = deserialize_avro(value, schema)
+                        
+                        logger.info(f"📥 [CONSUMER] Received Avro message from topic '{topic}'")
+                        message_handler(avro_message)
                     except Exception as e:
-                        logger.error(f"Error processing message: {e}", exc_info=True)
+                        logger.error(f"Failed to deserialize Avro message: {e}", exc_info=True)
 
             except KafkaException as e:
                 consecutive_errors += 1

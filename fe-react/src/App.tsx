@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import "./App.css";
 import { formatMessage } from "./utils/formatMessage";
+import InsightsPanel from "./components/InsightsPanel";
 
 interface Message {
   sender: "user" | "bot";
@@ -72,35 +73,41 @@ export default function App() {
         </div>
       </nav>
 
-      <div className="chat-container">
-        <header className="chat-header">🤖 AI Assistant</header>
+      <div className="main-content">
+        <div className="insights-section">
+          <InsightsPanel />
+        </div>
+        
+        <div className="chat-container">
+          <header className="chat-header">🤖 AI Assistant</header>
 
-        <main className="chat-messages">
-          {messages.map((msg, i) => (
-            <div
-              key={i}
-              className={`chat-bubble ${msg.sender === "user" ? "user" : "bot"}`}
-            >
-              {msg.sender === "bot" ? formatMessage(msg.text) : msg.text}
-            </div>
-          ))}
-          {loading && <div className="chat-bubble bot">Thinking...</div>}
-          <div ref={chatEndRef} />
-        </main>
+          <main className="chat-messages">
+            {messages.map((msg, i) => (
+              <div
+                key={i}
+                className={`chat-bubble ${msg.sender === "user" ? "user" : "bot"}`}
+              >
+                {msg.sender === "bot" ? formatMessage(msg.text) : msg.text}
+              </div>
+            ))}
+            {loading && <div className="chat-bubble bot">Thinking...</div>}
+            <div ref={chatEndRef} />
+          </main>
 
-      <form className="chat-input-area" onSubmit={sendMessage}>
-        <input
-          type="text"
-          style={{backgroundColor: "white", color : 'black'}}
-          placeholder="Type your question..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          disabled={loading}
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? "..." : "Send"}
-        </button>
-      </form>
+          <form className="chat-input-area" onSubmit={sendMessage}>
+            <input
+              type="text"
+              style={{backgroundColor: "white", color : 'black'}}
+              placeholder="Type your question..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              disabled={loading}
+            />
+            <button type="submit" disabled={loading}>
+              {loading ? "..." : "Send"}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
