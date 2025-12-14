@@ -25,4 +25,5 @@ dependencies = [
     "postgres>=4.0",
     "psycopg2-binary>=2.9.0",
     "confluent-kafka>=2.12.2",
+    "uvicorn[standard]>=0.30.0",
 ]

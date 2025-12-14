@@ -3621,6 +3621,7 @@ dependencies = [
     { name = "psycopg2-binary" },
     { name = "pymongo" },
     { name = "sentence-transformers" },
+    { name = "uvicorn", extra = ["standard"] },
 ]
 
 [package.metadata]
@@ -3645,6 +3646,7 @@ requires-dist = [
     { name = "psycopg2-binary", specifier = ">=2.9.0" },
     { name = "pymongo", specifier = ">=4.15.3" },
     { name = "sentence-transformers", specifier = ">=5.1.2" },
+    { name = "uvicorn", extras = ["standard"], specifier = ">=0.30.0" },
 ]
 
 [[package]]
