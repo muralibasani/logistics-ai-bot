@@ -52,6 +52,7 @@ pip install -r requirements.txt  # if you have one, or install from pyproject.to
 3. Make sure Kafka topics exist:
    - `events.workflow.commands`
    - `events.output.message`
+   - `events.insights.message`
 
 ### Frontend Setup
 
