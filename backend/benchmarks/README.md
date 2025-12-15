@@ -66,47 +66,47 @@ python benchmarks/performance_test.py --url http://localhost:8000 --concurrency 
 
 📡 API PERFORMANCE:
    Total Requests:      100
-   Successful:          14
-   Failed:              86
-   Requests/Second:     11.91
-   Error Rate:          86.00%
+   Successful:          100
+   Failed:              0
+   Requests/Second:     1.71
+   Error Rate:          0.00%
 
    Response Times (seconds):
-      Average:          0.507s
-      Median:           0.002s
-      Min:              0.001s
-      Max:              5.028s
-      P95:               2.834s
-      P99:               5.028s
+      Average:          5.351s
+      Median:           5.229s
+      Min:              0.919s
+      Max:              9.484s
+      P95:               6.559s
+      P99:               9.484s
 
    Status Code Distribution:
-      0: 86 (86.0%)
-      200: 14 (14.0%)
+      200: 100 (100.0%)
 
 📤 KAFKA PERFORMANCE:
    Total Operations:     100
    Successful:          100
    Failed:              0
-   Operations/Second:   11.91
+   Operations/Second:   1.71
    Error Rate:          0.00%
 
    Latency (seconds):
-      Average:          0.003s
+      Average:          0.004s
       Median:           0.000s
       Min:              0.000s
-      Max:              0.304s
+      Max:              0.342s
       P95:               0.000s
-      P99:               0.304s
+      P99:               0.342s
 
    Message Statistics:
       Avg Message Size: 183 bytes
       Total Bytes:      18,310 bytes
 
 🚀 OVERALL SYSTEM PERFORMANCE:
-   Total Test Duration:  8.40s
-   Overall Throughput:   23.82 ops/sec
+   Total Test Duration:  58.31s
+   Overall Throughput:   3.43 ops/sec
    (Combined API + Kafka operations per second)
 ================================================================================
+
 ```
 
 ## Benchmark Scenarios
