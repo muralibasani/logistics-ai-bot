@@ -211,6 +211,19 @@ def get_order_details_tool(order_id: int) -> str:
 @tool
 def default_tool(user_message: str) -> str:
     """Handle general conversational messages like greetings, thanks, farewells, compliments, or general questions that don't require order management tools. Use this for: greetings (hello, hi, hey), thanks (thank you, thanks), farewells (bye, goodbye, see you), compliments (good job, well done), or general conversation."""
+    import os
+    from dotenv import load_dotenv
+    
+    load_dotenv()
+    USE_MOCK_LLM = os.getenv("USE_MOCK_LLM", "false").lower() == "true"
+    MOCK_LLM_DELAY = float(os.getenv("MOCK_LLM_DELAY", "0.000001"))
+    
+    # Use mock LLM if enabled
+    if USE_MOCK_LLM:
+        from src.mock_llm import mock_default_tool
+        return mock_default_tool(user_message, delay_ns=MOCK_LLM_DELAY)
+    
+    # Use real LLM
     from langchain_core.messages import SystemMessage, HumanMessage
     
     # Create a friendly, context-aware system prompt for conversational responses
