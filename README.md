@@ -2,6 +2,9 @@
 
 This guide explains how to run the Logistics AI Bot with the React frontend.
 
+## Blog 
+https://medium.com/@murali-basani/an-ai-powered-logistics-solution-for-5-a-month-kafka-langchain-and-openai-b32f1e73198b
+
 ## Architecture
 
 ```
